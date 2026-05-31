@@ -3,6 +3,15 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { EmptyState } from '@/components/EmptyState';
+import { PoolCard } from '@/components';
+import {
+  usePoolsStore,
+  type Pool,
+  type PoolStatus,
+  type SortOption,
+} from '@/src/store/poolsStore';
+
+// We extract categories from MOCK_POOLS dynamically or define them statically
 import { usePoolsStore } from '@/src/store/poolsStore';
 import { PoolCard, Pagination } from '@/components';
 
