@@ -19,7 +19,7 @@ export interface Transaction {
   txHash: string;
 }
 
-const MOCK_TRANSACTIONS: Transaction[] = [
+export const MOCK_TRANSACTIONS: Transaction[] = [
   {
     id: '1',
     type: 'donation',
@@ -252,7 +252,6 @@ function SearchIcon() {
     </svg>
   );
 }
-
 
 const TYPE_ICON: Record<TxType, React.ReactNode> = {
   donation: <DonationIcon />,
@@ -581,4 +580,3 @@ export default function TransactionsPage() {
     </ProtectedRoute>
   );
 }
-
