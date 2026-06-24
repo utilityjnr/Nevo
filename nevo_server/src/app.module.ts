@@ -3,6 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { User } from './users/user.entity';
+import { Pool } from './pools/pool.entity';
+import { PoolsModule } from './pools/pools.module';
 
 @Module({
   imports: [
@@ -13,10 +15,11 @@ import { User } from './users/user.entity';
       username: process.env.DB_USER ?? 'postgres',
       password: process.env.DB_PASSWORD ?? 'postgres',
       database: process.env.DB_NAME ?? 'nevo',
-      entities: [User],
+      entities: [User, Pool],
       migrations: ['dist/migrations/*.js'],
       synchronize: false,
     }),
+    PoolsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
