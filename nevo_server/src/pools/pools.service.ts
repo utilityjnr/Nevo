@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Pool } from './pool.entity';
+import type { CreatePoolDto, UpdatePoolDto } from './pools.controller';
+import { ContractService } from '../contract/contract.service.js';
 
 export interface ChainPoolData {
   contractPoolId: string;
@@ -14,6 +16,7 @@ export class PoolsService {
   constructor(
     @InjectRepository(Pool)
     private readonly poolRepo: Repository<Pool>,
+    private readonly contractService: ContractService,
   ) {}
 
   async upsertFromChain(data: ChainPoolData): Promise<Pool> {
@@ -34,5 +37,74 @@ export class PoolsService {
         goal: data.goal,
       }),
     );
+  }
+
+  async create(dto: CreatePoolDto): Promise<Pool> {
+    return this.poolRepo.save(
+      this.poolRepo.create({
+        contractPoolId: dto.contractPoolId,
+        creatorWallet: dto.creatorWallet,
+        goal: dto.goal,
+        title: dto.title ?? null,
+        description: dto.description ?? null,
+        imageUrl: dto.imageUrl ?? null,
+      }),
+    );
+  }
+
+  async updateMeta(
+    contractPoolId: string,
+    dto: UpdatePoolDto,
+  ): Promise<Pool | null> {
+    const pool = await this.poolRepo.findOne({ where: { contractPoolId } });
+    if (!pool) return null;
+    if (dto.description !== undefined) pool.description = dto.description;
+    if (dto.imageUrl !== undefined) pool.imageUrl = dto.imageUrl;
+    return this.poolRepo.save(pool);
+  }
+
+  async findByContractId(contractPoolId: string): Promise<Pool | null> {
+    return this.poolRepo.findOne({ where: { contractPoolId } });
+  }
+
+  async findOneMerged(contractPoolId: string) {
+    const pool = await this.poolRepo.findOne({ where: { contractPoolId } });
+    if (!pool) return null;
+
+    const poolIdNum = parseInt(contractPoolId, 10);
+    let raisedOnChain = '0';
+    let closedOnChain = false;
+    let donorCount = 0;
+
+    if (!isNaN(poolIdNum)) {
+      const [poolOnChain, totalRaisedOnChain, donorCountOnChain] = await Promise.all([
+        this.contractService.getPoolOnChain(poolIdNum),
+        this.contractService.getTotalRaisedOnChain(poolIdNum),
+        this.contractService.getDonorCountOnChain(poolIdNum),
+      ]);
+
+      if (poolOnChain) {
+        raisedOnChain = poolOnChain.collected.toString();
+        closedOnChain = poolOnChain.isClosed;
+      } else if (totalRaisedOnChain) {
+        raisedOnChain = totalRaisedOnChain.toString();
+      }
+
+      if (donorCountOnChain) {
+        donorCount = donorCountOnChain;
+      }
+    }
+
+    return {
+      ...pool,
+      raisedOnChain,
+      closedOnChain,
+      donorCount,
+    };
+  }
+
+  buildWithdrawTx(pool: Pool): { unsignedXdr: string; poolId: string } {
+    // TODO: replace with real Stellar transaction build calling contract.withdraw (#657)
+    return { unsignedXdr: 'placeholder_xdr', poolId: pool.contractPoolId };
   }
 }

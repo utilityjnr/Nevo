@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { PoolsService } from '../pools/pools.service';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { PoolsService } from '../pools/pools.service.js';
 
 /** Minimal shape of a Stellar Horizon Soroban contract event. */
 export interface HorizonContractEvent {
@@ -15,6 +16,12 @@ export interface HorizonContractEvent {
 @Injectable()
 export class SyncService {
   constructor(private readonly poolsService: PoolsService) {}
+
+  // TODO: replace with real implementation once HorizonService (#46) is available
+  @Cron(CronExpression.EVERY_MINUTE)
+  async pollHorizonEvents(): Promise<void> {
+    // stub — will call HorizonService.fetchContractEvents() when implemented
+  }
 
   async processPoolCreatedEvent(event: HorizonContractEvent): Promise<void> {
     const contractPoolId = event.topic[1];

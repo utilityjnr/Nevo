@@ -29,6 +29,7 @@ fn test_create_pool() {
         &String::from_str(&env, "Emergency Relief Fund"),
         &String::from_str(&env, "Helping those in need"),
         &1_000_000_000u128,
+        &100_000u64,
     );
 
     assert_eq!(pool_id, 1);
@@ -53,6 +54,7 @@ fn test_donate() {
         &String::from_str(&env, "Educational Scholarship"),
         &String::from_str(&env, "Support for students"),
         &10_000_000_000u128,
+        &100_000u64,
     );
 
     client.donate(&pool_id, &donor, &100_000_000u128);
@@ -72,6 +74,7 @@ fn test_multiple_donations() {
         &String::from_str(&env, "Community Project"),
         &String::from_str(&env, "Building together"),
         &5_000_000_000u128,
+        &100_000u64,
     );
 
     client.donate(&pool_id, &Address::generate(&env), &100_000_000u128);
@@ -93,6 +96,7 @@ fn test_close_pool() {
         &String::from_str(&env, "Closed Pool"),
         &String::from_str(&env, "Test pool"),
         &1_000_000_000u128,
+        &100_000u64,
     );
     client.set_pool_state(&pool_id, &PoolState::Disbursed);
     client.close_pool(&pool_id);
@@ -114,6 +118,7 @@ fn test_donate_to_closed_pool() {
         &String::from_str(&env, "Test Pool"),
         &String::from_str(&env, "Test"),
         &1_000_000_000u128,
+        &100_000u64,
     );
     client.set_pool_state(&pool_id, &PoolState::Disbursed);
     client.close_pool(&pool_id);
@@ -134,6 +139,7 @@ fn test_close_pool_unauthorized() {
         &String::from_str(&env, "Test Pool"),
         &String::from_str(&env, "Test"),
         &1_000_000_000u128,
+        &100_000u64,
     );
     client
         .mock_auths(&[MockAuth {
@@ -159,12 +165,14 @@ fn test_multiple_pools() {
         &String::from_str(&env, "Pool 1"),
         &String::from_str(&env, "First pool"),
         &1_000_000_000u128,
+        &100_000u64,
     );
     let pool_id_2 = client.create_pool(
         &Address::generate(&env),
         &String::from_str(&env, "Pool 2"),
         &String::from_str(&env, "Second pool"),
         &2_000_000_000u128,
+        &100_000u64,
     );
 
     assert_eq!(pool_id_1, 1);
@@ -193,6 +201,7 @@ fn test_get_total_raised_starts_at_zero() {
         &String::from_str(&env, "Fresh Pool"),
         &String::from_str(&env, "No donations yet"),
         &1_000_000_000u128,
+        &100_000u64,
     );
     assert_eq!(client.get_total_raised(&pool_id), 0);
 }
@@ -219,6 +228,7 @@ fn test_pool_description_exceeds_max_length() {
         &String::from_str(&env, "Title"),
         &long_desc,
         &1_000_000_000u128,
+        &100_000u64,
     );
 }
 
@@ -239,6 +249,7 @@ fn test_claim_funds_no_status() {
         &String::from_str(&env, "Test Pool"),
         &String::from_str(&env, "Test"),
         &1_000_000_000u128,
+        &100_000u64,
     );
     client.donate(&pool_id, &creator, &500_000_000u128);
     let token = Address::generate(&env);
@@ -260,6 +271,7 @@ fn test_claim_funds_rejected_application() {
         &String::from_str(&env, "Test Pool"),
         &String::from_str(&env, "Test"),
         &1_000_000_000u128,
+        &100_000u64,
     );
     client.donate(&pool_id, &creator, &500_000_000u128);
     client.set_application_status(&pool_id, &student, &String::from_str(&env, "Rejected"));
@@ -282,6 +294,7 @@ fn test_claim_funds_overdraw() {
         &String::from_str(&env, "Test Pool"),
         &String::from_str(&env, "Test"),
         &1_000_000_000u128,
+        &100_000u64,
     );
     client.donate(&pool_id, &creator, &100_000_000u128);
     client.set_application_status(&pool_id, &student, &String::from_str(&env, "Approved"));
@@ -304,6 +317,7 @@ fn test_claim_funds_negative_amount() {
         &String::from_str(&env, "Test Pool"),
         &String::from_str(&env, "Test"),
         &1_000_000_000u128,
+        &100_000u64,
     );
     client.donate(&pool_id, &creator, &500_000_000u128);
     client.set_application_status(&pool_id, &student, &String::from_str(&env, "Approved"));
@@ -324,6 +338,7 @@ fn test_get_claimed_amount_initial_zero() {
         &String::from_str(&env, "Test Pool"),
         &String::from_str(&env, "Test"),
         &1_000_000_000u128,
+        &100_000u64,
     );
     assert_eq!(client.get_claimed_amount(&pool_id, &student), 0);
 }
@@ -341,6 +356,7 @@ fn test_get_application_status() {
         &String::from_str(&env, "Test Pool"),
         &String::from_str(&env, "Test"),
         &1_000_000_000u128,
+        &100_000u64,
     );
 
     assert_eq!(
@@ -374,6 +390,7 @@ fn test_protocol_fees_accumulation_on_claim() {
         &String::from_str(&env, "Test Pool"),
         &String::from_str(&env, "Test"),
         &1_000_000_000u128,
+        &100_000u64,
     );
     client.donate(&pool_id, &creator, &500_000_000u128);
     client.set_application_status(&pool_id, &student, &String::from_str(&env, "Approved"));
@@ -433,6 +450,7 @@ fn test_claim_protocol_fees_multiple_claims_accumulate() {
         &String::from_str(&env, "Test Pool"),
         &String::from_str(&env, "Test"),
         &1_000_000_000u128,
+        &100_000u64,
     );
     client.donate(&pool_id, &creator, &500_000_000u128);
     client.set_application_status(&pool_id, &student1, &String::from_str(&env, "Approved"));
@@ -464,6 +482,7 @@ fn test_protocol_fees_reset_after_claim() {
         &String::from_str(&env, "Test Pool"),
         &String::from_str(&env, "Test"),
         &1_000_000_000u128,
+        &100_000u64,
     );
     client.donate(&pool_id, &creator, &500_000_000u128);
     client.set_application_status(&pool_id, &student, &String::from_str(&env, "Approved"));
@@ -487,6 +506,7 @@ fn test_new_campaign_has_zero_donors() {
         &String::from_str(&env, "Test Pool"),
         &String::from_str(&env, "Description"),
         &1_000_000_000u128,
+        &100_000u64,
     );
     assert_eq!(client.get_donor_count(&pool_id), 0);
 }

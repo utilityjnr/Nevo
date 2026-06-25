@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import { PoolsModule } from '../pools/pools.module';
-import { SyncService } from './sync.service';
+import { ScheduleModule } from '@nestjs/schedule';
+import { PoolsModule } from '../pools/pools.module.js';
+import { SyncService } from './sync.service.js';
 
 @Module({
-  imports: [PoolsModule],
+  imports: [ScheduleModule.forRoot(), PoolsModule],
   providers: [SyncService],
   exports: [SyncService],
 })

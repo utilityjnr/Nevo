@@ -10,6 +10,7 @@ export const NAV_LINKS = [
   { label: 'Pools', href: '/pools' },
   { label: 'Donations', href: '/donations' },
   { label: 'Transactions', href: '/transactions' },
+  { label: 'Stories', href: '/stories' },
   { label: 'Dashboard', href: '/dashboard' },
   { label: 'Profile', href: '/profile' },
   { label: 'Create Pool', href: '/pools/new' },
@@ -88,7 +89,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
       <button
         type="button"
         className="absolute inset-0 bg-black/40 transition-opacity duration-300"
-        aria-label="Close menu"
+        aria-label="Close menu overlay"
         tabIndex={open ? 0 : -1}
         onClick={onClose}
       />
