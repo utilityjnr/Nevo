@@ -7,7 +7,6 @@ import { JwtService } from '@nestjs/jwt';
 import { Keypair, StrKey } from '@stellar/stellar-sdk';
 import { UsersService } from '../users/users.service';
 import { randomBytes } from 'crypto';
-import { Keypair, StrKey } from '@stellar/stellar-sdk';
 import { NonceService } from './nonce.service';
 
 export interface VerifyDto {

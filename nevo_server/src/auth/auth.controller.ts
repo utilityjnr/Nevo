@@ -23,7 +23,7 @@ export class AuthController {
   }
 
   @Post('verify')
-  verify(@Body() dto: VerifyAuthDto): Promise<AuthResult> {
+  verify(@Body() dto: VerifyDto): Promise<AuthResult> {
     return this.authService.verify(dto);
   }
 }
