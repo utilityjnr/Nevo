@@ -4,17 +4,10 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Keypair } from '@stellar/stellar-sdk';
+import { Keypair, StrKey } from '@stellar/stellar-sdk';
 import { UsersService } from '../users/users.service';
-import { User } from '../users/user.entity';
 import { randomBytes } from 'crypto';
-import { StrKey } from '@stellar/stellar-sdk';
-
-export interface VerifyDto {
-  publicKey: string;
-  signature: string;
-  message: string;
-}
+import { VerifyAuthDto } from './dto/verify-auth.dto';
 
 export interface AuthResult {
   accessToken: string;
@@ -60,16 +53,24 @@ export class AuthService {
     return { nonce, expiresAt };
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
+  createNonce(publicKey: string): string {
+    const nonce = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    this.challenges.set(publicKey, {
+      nonce,
+      expiresAt: Date.now() + CHALLENGE_TTL_MS,
+    });
+    return nonce;
+  }
+
   async verify(dto: VerifyAuthDto): Promise<AuthResult> {
-    const nonceEntry = this.nonces.get(dto.publicKey);
+    const nonceEntry = this.challenges.get(dto.publicKey);
 
     if (!nonceEntry || nonceEntry.expiresAt < Date.now()) {
-      this.nonces.delete(dto.publicKey);
+      this.challenges.delete(dto.publicKey);
       throw new UnauthorizedException('Nonce expired or not found');
     }
 
-    if (nonceEntry.value !== dto.nonce) {
+    if (nonceEntry.nonce !== dto.nonce) {
       throw new UnauthorizedException('Invalid nonce');
     }
 
@@ -77,23 +78,13 @@ export class AuthService {
       throw new UnauthorizedException('Invalid signature');
     }
 
-    this.nonces.delete(dto.publicKey);
+    this.challenges.delete(dto.publicKey);
 
     const accessToken = this.jwtService.sign({
       sub: dto.publicKey,
     });
 
     return { accessToken };
-  }
-
-  createNonce(publicKey: string): string {
-    const nonce = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    this.nonces.set(publicKey, {
-      value: nonce,
-      expiresAt: Date.now() + 5 * 60 * 1000,
-    });
-
-    return nonce;
   }
 
   verifySignature(

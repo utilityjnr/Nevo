@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import type { VerifyDto, AuthResult, ChallengeResult } from './auth.service';
+import { VerifyAuthDto } from './dto/verify-auth.dto';
+import type { AuthResult, ChallengeResult } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
